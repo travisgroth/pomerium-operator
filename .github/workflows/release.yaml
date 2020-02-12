@@ -30,7 +30,7 @@ jobs:
         run: curl -sL https://taskfile.dev/install.sh | sh
 
       - name: Release
-        run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} task release
+        run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} bin/task release
 
       - name: List
         run: ls dist/
