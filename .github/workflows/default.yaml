@@ -88,11 +88,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: pomerium/pomerium-operator
-
-      - name: Docker Publish - Latest
-        uses: zenato/docker-action@master
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: pomerium/pomerium-operator
-          tag: latest
+      # - name: Docker Publish - Latest
+      #   uses: zenato/docker-action@master
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USER }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      #     repository: pomerium/pomerium-operator
+      #     tag: latest

@@ -23,21 +23,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1.1.0
 
-      - name: Get tag name
-        id: tagName
-        uses: olegtarasov/get-tag@v1
-
       - name: Install go-task
         run: curl -sL https://taskfile.dev/install.sh | sh
 
       - name: Release
         run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} bin/task release
-
-      - name: List
-        run: ls dist/
-
-      - name: Show Tag
-        run: echo TAG is ${{ steps.tagName.outputs.tag }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v1-release
@@ -47,16 +37,33 @@ jobs:
           file_glob: true
           tag: ${{ github.ref }}
           overwrite: true
-  # publish-docker:
-  #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check out code
-  #       uses: actions/checkout@v1.1.0
-  #     - name: Docker Publish - Latest
-  #       uses: zenato/docker-action@master
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USER }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #         repository: pomerium/pomerium-operator
-  #         tag: latest
+
+  release-docker:
+    needs:
+      - release-binary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1.1.0
+
+      - name: Get tag name
+        id: tagName
+        uses: olegtarasov/get-tag@v1
+
+      - name: Docker Publish - Release
+        uses: zenato/docker-action@master
+        continue-on-error: true
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: pomerium/pomerium-operator
+          tag: ${{ steps.tagName.outputs.tag }}
+
+      - name: Docker Publish - Latest
+        if: ! contains(steps.tagName.outputs.tag, "rc")
+        uses: zenato/docker-action@master
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: pomerium/pomerium-operator
+          tag: latest
