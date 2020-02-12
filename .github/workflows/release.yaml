@@ -1,10 +1,8 @@
 name: Release
 on:
   push:
-    branches:
-      - origin_master
     tags:
-      - v.*
+      - "v*"
 
 jobs:
   release-binary:
