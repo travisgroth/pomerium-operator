@@ -1,0 +1,50 @@
+name: Release
+on:
+  push:
+    tags:
+      - v.*
+
+jobs:
+  release-binary:
+    runs-on: ubuntu-latest
+    container:
+      image: "golang:1.13"
+    strategy:
+      matrix:
+        os:
+          - darwin
+          - linux
+        arch:
+          - amd64
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1.1.0
+
+      - name: Get tag name
+        id: tagName
+        uses: olegtarasov/get-tag@v1
+
+      - name: Install go-task
+        run: curl -sL https://taskfile.dev/install.sh | sh
+
+      - name: Release
+        run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} task release
+
+      - name: List
+        run: ls dist/
+
+      - name: Show Tag
+        run: echo TAG is ${{ steps.tagName.outputs.tag }}
+  # publish-docker:
+  #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v1.1.0
+  #     - name: Docker Publish - Latest
+  #       uses: zenato/docker-action@master
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USER }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #         repository: pomerium/pomerium-operator
+  #         tag: latest
