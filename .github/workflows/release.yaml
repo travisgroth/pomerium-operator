@@ -60,7 +60,7 @@ jobs:
           tag: ${{ steps.tagName.outputs.tag }}
 
       - name: Docker Publish - Latest
-        if: ! contains(${{steps.tagName.outputs.tag}}, "rc")
+        if: "!contains(steps.tagName.outputs.tag, 'rc')"
         uses: zenato/docker-action@master
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
